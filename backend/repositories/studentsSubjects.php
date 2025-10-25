@@ -39,6 +39,32 @@ function getAllSubjectsStudents($conn)
     return $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
 
+//2.0
+function getPaginatedSubjectsStudents($conn, $limit, $offset) 
+{
+    $stmt = $conn->prepare("SELECT students_subjects.id,
+                students_subjects.student_id,
+                students_subjects.subject_id,
+                students_subjects.approved,
+                students.fullname AS student_fullname,
+                subjects.name AS subject_name
+            FROM students_subjects
+            JOIN subjects ON students_subjects.subject_id = subjects.id
+            JOIN students ON students_subjects.student_id = students.id LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $limit, $offset);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+//2.0
+function getTotalSubjectsStudents($conn) 
+{
+    $sql = "SELECT COUNT(*) AS total FROM students_subjects";
+    $result = $conn->query($sql);
+    return $result->fetch_assoc()['total'];
+}
+
 //Query escrita con ALIAS resumidos:
 function getSubjectsByStudent($conn, $student_id) 
 {

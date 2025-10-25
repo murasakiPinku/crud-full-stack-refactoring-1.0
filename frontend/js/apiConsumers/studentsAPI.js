@@ -5,7 +5,7 @@
 *    License     : http://www.gnu.org/licenses/gpl.txt  GNU GPL 3.0
 *    Date        : Mayo 2025
 *    Status      : Prototype
-*    Iteration   : 3.0 ( prototype )
+*    Iteration   : 1.0 ( prototype )
 */
 
 import { createAPI } from './apiFactory.js';
