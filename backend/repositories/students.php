@@ -73,14 +73,29 @@ function updateStudent($conn, $id, $fullname, $email, $age)
     return ['updated' => $stmt->affected_rows];
 }
 
+//3.1
 function deleteStudent($conn, $id) 
 {
-    $sql = "DELETE FROM students WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
+    //PRIMERO VERIFICO QUE NO HAYAN FILAS QUE TIENEN EN LA RELACION AL ESTUDIANTE
+    $checkSql = "SELECT COUNT(*) AS count FROM students_subjects WHERE student_id = ?";
+    $checkStmt = $conn->prepare($checkSql);
+    $checkStmt->bind_param("i", $id);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result()->fetch_assoc();
 
-    //Se retorna fila afectadas para validar en controlador
-    return ['deleted' => $stmt->affected_rows];
+    if ($result['count'] > 0) { //HAY ALMENOS UNA RELACION!, NO BORRAR!
+        return ['deleted' => 0,
+                'error' => 'No se pudo eliminar al estudiante, tiene materias asignadas.'];
+    }else{                      //NO HAY RELACIONES, BORRAR!
+        $sql = "DELETE FROM students WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
+        //Se retorna fila afectadas para validar en controlador
+        return ['deleted' => $stmt->affected_rows];
+    }
 }
+
+
 ?>

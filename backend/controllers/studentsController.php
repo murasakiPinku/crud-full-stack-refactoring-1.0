@@ -74,19 +74,18 @@ function handlePut($conn)
     }
 }
 
+//3.1
 function handleDelete($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
-
     $result = deleteStudent($conn, $input['id']);
-    if ($result['deleted'] > 0) 
-    {
-        echo json_encode(["message" => "Eliminado correctamente"]);
-    } 
-    else 
-    {
-        http_response_code(500);
-        echo json_encode(["error" => "No se pudo eliminar"]);
-    }
+
+    if (isset($result['error'])) { //SI DEVOLVIO UN ERROR
+        http_response_code(400);   //HTTP DEVOLVERA 400: ERROR DE UN PEDIDO MAL FORMADO
+        echo json_encode(["error" => $result['error']]);
+    }else
+        if ($result['deleted'] > 0){  //SI SE PUDO BORRAR
+            echo json_encode(["message" => "Eliminado correctamente"]);
+        }  
 }
 ?>

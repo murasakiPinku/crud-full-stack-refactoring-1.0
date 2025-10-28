@@ -29,23 +29,6 @@ INSERT INTO `students` (`id`, `fullname`, `email`, `age`) VALUES
 (2,	'Lucas Torres',	'lucas@example.com',	24),
 (3,	'Marina Díaz',	'marina@example.com',	22);
 
-DROP TABLE IF EXISTS `students_subjects`;
-CREATE TABLE `students_subjects` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `student_id` int(11) NOT NULL,
-  `subject_id` int(11) NOT NULL,
-  `approved` tinyint(1) DEFAULT 0,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `student_id` (`student_id`,`subject_id`),
-  KEY `subject_id` (`subject_id`),
-  CONSTRAINT `students_subjects_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `students_subjects_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-INSERT INTO `students_subjects` (`id`, `student_id`, `subject_id`, `approved`) VALUES
-(1,	1,	1,	1),
-(2,	2,	2,	0);
-
 DROP TABLE IF EXISTS `subjects`;
 CREATE TABLE `subjects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -59,5 +42,23 @@ INSERT INTO `subjects` (`id`, `name`) VALUES
 (4,	'Fundamentos de Informática'),
 (1,	'Tecnologías A'),
 (2,	'Tecnologías B');
+
+-- 3.1
+DROP TABLE IF EXISTS `students_subjects`;
+CREATE TABLE `students_subjects` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `student_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  `approved` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `student_id` (`student_id`,`subject_id`),
+  KEY `subject_id` (`subject_id`),
+  CONSTRAINT `students_subjects_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`), -- ON DELETE CASCADE OMITIDO!
+  CONSTRAINT `students_subjects_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`)  -- ON DELETE CASCADE OMITIDO! 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `students_subjects` (`id`, `student_id`, `subject_id`, `approved`) VALUES
+(1,	1,	1,	1),
+(2,	2,	2,	0);
 
 -- 2025-05-28 00:09:08

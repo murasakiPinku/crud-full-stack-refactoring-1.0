@@ -175,6 +175,7 @@ function fillForm(student)
     document.getElementById('age').value = student.age;
 }
   
+//3.1
 async function confirmDelete(id) 
 {
     if (!confirm('¿Estás seguro que deseas borrar este estudiante?')) return;
@@ -183,9 +184,11 @@ async function confirmDelete(id)
     {
         await studentsAPI.remove(id);
         loadStudents();
+        alert('Se ha eliminado correctamente!');
     } 
     catch (err) 
     {
+        alert(err.message); //MUESTRO EL ERROR QUE ME TIRA EL BACKEND
         console.error('Error al borrar:', err.message);
     }
 }

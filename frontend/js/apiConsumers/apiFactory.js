@@ -12,6 +12,7 @@ export function createAPI(moduleName, config = {})
 {
     const API_URL = config.urlOverride ?? `../../backend/server.php?module=${moduleName}`;
 
+    //3.1 
     async function sendJSON(method, data) 
     {
         const res = await fetch(API_URL,
@@ -21,8 +22,14 @@ export function createAPI(moduleName, config = {})
             body: JSON.stringify(data)
         });
 
-        if (!res.ok) throw new Error(`Error en ${method}`);
-        return await res.json();
+        const body = await res.json().catch(() => ({})); //RECIBO LA RESPUESTA HTTP COMO JSON, SI NO HAY JSON SE RECIBE {} PARA NO CORTAR EJECUCION
+
+        if (!res.ok) { //SI HUBO UN ERROR
+            const message = body.error || body.message || `Error en ${method}`; //GUARDO ERROR DEPENDE COMO HAYA GUARDADO LA RESPUESTA EL JSON, .error O .message
+            throw new Error(message); //LE DEVUELVO EL ERROR AL CONTEXTO QUE ME INVOCO
+        }
+
+        return body;
     }
 
     return {
