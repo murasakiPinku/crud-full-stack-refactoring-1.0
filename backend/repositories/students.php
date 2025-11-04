@@ -51,7 +51,20 @@ function createStudent($conn, $fullname, $email, $age)
     $sql = "INSERT INTO students (fullname, email, age) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssi", $fullname, $email, $age);
-    $stmt->execute();
+
+    //3.2
+    if (!$stmt->execute()){ //verifico si esta ejecucion fallo
+        if ($conn->errno==1062){ //Si el error es por Duplicate entry me devuelve el codigo 1062 
+            return [
+                'inserted'=> 0,
+                'error'=> 'Hubo un error: el correo electronico que se ingreso ya existe'
+            ];
+        }
+        return [ //si es otro error
+            'inserted'=>0,
+            'error'=>$stmt->error
+        ];
+        }
 
     //Se retorna un arreglo con la cantidad e filas insertadas 
     //y id insertado para validar en el controlador:
