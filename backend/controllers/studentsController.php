@@ -41,13 +41,19 @@ function handleGet($conn)
         echo json_encode($students);
     }
 }
-
+//3.2
 function handlePost($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
 
     $result = createStudent($conn, $input['fullname'], $input['email'], $input['age']);
-    if ($result['inserted'] > 0) 
+    
+    if (isset($result['error'])) //si el repositorio me devuelve un error
+    {
+        http_response_code(400); //envio codigo de error 400=Bad Request
+        echo json_encode(["error"=>$result['error']]);
+    }
+    else if ($result['inserted'] > 0) //si no hay problema
     {
         echo json_encode(["message" => "Estudiante agregado correctamente"]);
     } 
