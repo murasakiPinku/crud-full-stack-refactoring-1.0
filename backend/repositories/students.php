@@ -51,7 +51,20 @@ function createStudent($conn, $fullname, $email, $age)
     $sql = "INSERT INTO students (fullname, email, age) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssi", $fullname, $email, $age);
-    $stmt->execute();
+
+    //3.2
+    if (!$stmt->execute()){ //verifico si esta ejecucion fallo
+        if ($conn->errno==1062){ //Si el error es por Duplicate entry me devuelve el codigo 1062 
+            return [
+                'inserted'=> 0,
+                'error'=> 'Hubo un error: el correo electronico que se ingreso ya existe'
+            ];
+        }
+        return [ //si es otro error
+            'inserted'=>0,
+            'error'=>$stmt->error
+        ];
+        }
 
     //Se retorna un arreglo con la cantidad e filas insertadas 
     //y id insertado para validar en el controlador:
@@ -73,14 +86,29 @@ function updateStudent($conn, $id, $fullname, $email, $age)
     return ['updated' => $stmt->affected_rows];
 }
 
+//3.1
 function deleteStudent($conn, $id) 
 {
-    $sql = "DELETE FROM students WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
+    //PRIMERO VERIFICO QUE NO HAYAN FILAS QUE TIENEN EN LA RELACION AL ESTUDIANTE
+    $checkSql = "SELECT COUNT(*) AS count FROM students_subjects WHERE student_id = ?";
+    $checkStmt = $conn->prepare($checkSql);
+    $checkStmt->bind_param("i", $id);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result()->fetch_assoc();
 
-    //Se retorna fila afectadas para validar en controlador
-    return ['deleted' => $stmt->affected_rows];
+    if ($result['count'] > 0) { //HAY ALMENOS UNA RELACION!, NO BORRAR!
+        return ['deleted' => 0,
+                'error' => 'No se pudo eliminar al estudiante, tiene materias asignadas.'];
+    }else{                      //NO HAY RELACIONES, BORRAR!
+        $sql = "DELETE FROM students WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
+        //Se retorna fila afectadas para validar en controlador
+        return ['deleted' => $stmt->affected_rows];
+    }
 }
+
+
 ?>
