@@ -42,20 +42,29 @@ function handleGet($conn)
     }
 }
 
+// 3.3 TREJO
+
 function handlePost($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
 
     $result = createSubject($conn, $input['name']);
-    if ($result['inserted'] > 0) 
+
+    if (isset($result['error'])) //si el repositorio me devuelve un error, entonces, ingreso
     {
-        echo json_encode(["message" => "Materia creada correctamente"]);
-    } 
-    else 
-    {
-        http_response_code(500);
-        echo json_encode(["error" => "No se pudo crear"]);
+        http_response_code(400); //envio codigo de error 400
+        echo json_encode(["error"=>$result['error']]);
     }
+    else 
+        if ($result['inserted'] > 0) 
+            {
+                echo json_encode(["message" => "Materia creada correctamente"]);
+            } 
+        else 
+            {
+                http_response_code(500);
+                echo json_encode(["error" => "No se pudo crear"]);
+            }
 }
 
 function handlePut($conn) 

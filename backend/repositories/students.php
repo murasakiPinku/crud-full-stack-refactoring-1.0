@@ -66,8 +66,22 @@ function createStudent($conn, $fullname, $email, $age)
         ];
         }
 
-    //Se retorna un arreglo con la cantidad e filas insertadas 
-    //y id insertado para validar en el controlador:
+    //3.2
+    if (!$stmt->execute()){ //verifico si esta ejecucion fallo
+        if ($conn->errno==1062){ //Si el error es por Duplicate entry me devuelve el codigo 1062 
+            return [
+                'inserted'=> 0,
+                'error'=> 'Hubo un error: el correo electronico que se ingreso ya existe'
+            ];
+        }
+        return [ //si es otro error
+            'inserted'=>0,
+            'error'=>$stmt->error
+        ];
+        }
+
+    //Se retorna un arreglo con la cantidad de filas insertadas 
+    //y el id insertado para validar en el controlador:
     return 
     [
         'inserted' => $stmt->affected_rows,        

@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', () =>
     setupPaginationControls();//2.0
 });
 
+// 3.3 TREJO
+
 function setupSubjectFormHandler() 
 {
   const form = document.getElementById('subjectForm');
@@ -36,6 +38,25 @@ function setupSubjectFormHandler()
             id: document.getElementById('subjectId').value.trim(),
             name: document.getElementById('name').value.trim()
         };
+
+        // 3.3 TREJO
+
+        if (!subject.id) { // ingreso si la materia es nueva (no tiene id).
+            try {
+                
+                const allSubjects = await subjectsAPI.fetchAll(); // quiero tener a disposicion todas las materias para luego verificar que sea una nueva materia.
+
+                const nameExists = allSubjects.some(s => s.name.toUpperCase() === subject.name.toUpperCase()); // uso .toUpperCase() para la comparación de las palabras.
+
+                if (nameExists) { // si la materia ya existe lo informo y no la agrego.
+                    alert("Error: Ésta materia ya existe.");
+                    return; // detengo el envio del formulario
+                }
+            } catch (validationError) { //// Si esta validación falla tambien lo informamos
+                console.error("No se pudo validar la materia ingresada en el frontend:", validationError.message);
+            }
+        }
+
 
         try 
         {
@@ -55,6 +76,7 @@ function setupSubjectFormHandler()
         catch (err)
         {
             console.error(err.message);
+            alert(err.message); // informo al cliente el error que se produjo en el backend
         }
   });
 }

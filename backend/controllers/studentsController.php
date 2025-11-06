@@ -41,7 +41,9 @@ function handleGet($conn)
         echo json_encode($students);
     }
 }
+
 //3.2
+
 function handlePost($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
