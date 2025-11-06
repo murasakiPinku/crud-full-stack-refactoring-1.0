@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () =>
     setupCancelHandler();
     setupPaginationControls();//2.0
 });
-  
+ //3.2 
 function setupFormHandler()
 {
     const form = document.getElementById('studentForm');
@@ -31,7 +31,20 @@ function setupFormHandler()
     {
         e.preventDefault();
         const student = getFormData();
-    
+    if (!student.id) //si no tiene id, es estudiante nuevo, entonces lo valido
+    { 
+     try{
+        const allStudents=await studentsAPI.fetchAll(); //obtengo allstudents para comparar
+        const emailexiste=allStudents.some(s=>s.email===student.email); //.some para ver si alguno coincide
+
+     if (emailexiste){ //si existe el email
+        alert("Error:Este correo electronico ya existe.");
+        return; //detengo envio de formulario
+     }
+    }catch (validationError){ //si falla la validacion por algun motivo externo, como sin internet
+        console.error("No se pudo validar el email:",validationError.message);
+    }
+    }
         try 
         {
             if (student.id) 
@@ -47,7 +60,8 @@ function setupFormHandler()
         }
         catch (err)
         {
-            console.error(err.message);
+            console.error(err.message); //me agarra el error 400 mandado desde el backend, por apiFactory.js, cuando el backend responde con un error la apiFactory lo convierte en una Excepción
+            alert(err.message);//muestra error del backend al usuario,
         }
     });
 }
@@ -175,6 +189,7 @@ function fillForm(student)
     document.getElementById('age').value = student.age;
 }
   
+//3.1
 async function confirmDelete(id) 
 {
     if (!confirm('¿Estás seguro que deseas borrar este estudiante?')) return;
@@ -183,9 +198,11 @@ async function confirmDelete(id)
     {
         await studentsAPI.remove(id);
         loadStudents();
+        alert('Se ha eliminado correctamente!');
     } 
     catch (err) 
     {
+        alert(err.message); //MUESTRO EL ERROR QUE ME TIRA EL BACKEND
         console.error('Error al borrar:', err.message);
     }
 }

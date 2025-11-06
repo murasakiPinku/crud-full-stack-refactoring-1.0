@@ -50,13 +50,32 @@ function createSubject($conn, $name)
     $sql = "INSERT INTO subjects (name) VALUES (?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $name);
-    $stmt->execute();
+
+    // 3.3 TREJO
+    
+    if (!$stmt->execute())  //si la ejecución falló, entonces, ingreso
+        { 
+            if ($conn->errno==1062) //Si el error es por entrada duplicada me devuelve el codigo 1062
+                { 
+                    return 
+                        [
+                            'inserted'=> 0,
+                            'error'=> 'Hubo un error: La materia que se ingreso ya existe'
+                        ];
+                }
+            return //si es otro error
+                [ 
+                    'inserted'=>0,
+                    'error'=>$stmt->error
+                ];
+        }    
+
 
     return 
-    [
-        'inserted' => $stmt->affected_rows,        
-        'id' => $conn->insert_id
-    ];
+        [
+            'inserted' => $stmt->affected_rows,        
+            'id' => $conn->insert_id
+        ];
 }
 
 function updateSubject($conn, $id, $name) 
