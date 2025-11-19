@@ -5,7 +5,7 @@ This project is an educational prototype of a CRUD (Create Read Update and Delet
 
 ## Participants:
 
-* Matías Mercado
-* Mateo Zoratti
-* Franco Trejo
-* Juan Cruz Páez
+* Matías Mercado  //3.1
+* Mateo Zoratti  //3.4
+* Franco Trejo  //3.3
+* Juan Cruz Páez //3.2
