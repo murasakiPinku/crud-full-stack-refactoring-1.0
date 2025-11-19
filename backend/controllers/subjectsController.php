@@ -82,20 +82,19 @@ function handlePut($conn)
         echo json_encode(["error" => "No se pudo actualizar"]);
     }
 }
-
+//3.4
 function handleDelete($conn) 
 {
     $input = json_decode(file_get_contents("php://input"), true);
     
     $result = deleteSubject($conn, $input['id']);
-    if ($result['deleted'] > 0) 
+    
+    if (isset($result['error'])) //si la funcion devolvio error
     {
-        echo json_encode(["message" => "Materia eliminada correctamente"]);
+        http_response_code(409); // 409 Conflict, existe el id pero no se puede borrar
+        echo json_encode(["message" => $result['message'] ]); // envio el mensaje al frontend
     } 
-    else 
-    {
-        http_response_code(500);
-        echo json_encode(["error" => "No se pudo eliminar"]);
-    }
+    else if ($result['deleted'] > 0) 
+        echo json_encode(["message" => "Materia eliminada correctamente."]);
 }
 ?>

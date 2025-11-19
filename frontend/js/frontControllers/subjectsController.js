@@ -182,6 +182,7 @@ function createSubjectActionsCell(subject)
     return td;
 }
 
+//3.4
 async function confirmDeleteSubject(id)
 {
     if (!confirm('¿Seguro que deseas borrar esta materia?')) return;
@@ -193,6 +194,7 @@ async function confirmDeleteSubject(id)
     }
     catch (err)
     {
+        alert(err.message);// muestra el cartel
         console.error('Error al borrar materia:', err.message);
     }
 }

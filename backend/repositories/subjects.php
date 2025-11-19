@@ -88,8 +88,25 @@ function updateSubject($conn, $id, $name)
     return ['updated' => $stmt->affected_rows];
 }
 
+//3.4
+
 function deleteSubject($conn, $id) 
 {
+    $check_sql = "SELECT subject_id FROM students_subjects WHERE subject_id = ? LIMIT 1"; //busco el id de la materia en la tabla de relaciones
+
+    $check_stmt = $conn->prepare($check_sql); // obtengo de forma segura la query 
+    $check_stmt->bind_param("i", $id); // reemplaza el ? con el entero id
+    $check_stmt->execute(); //genera los resultados y los guarda
+    
+    $result = $check_stmt->get_result(); //obtiene los resultados generados anteriormente
+    
+    if ($result->num_rows > 0) { // si encuentra el id en la tabla de relaciones
+        return [ 
+            'error' => true, // creo una variable booleana error y le asigno true 
+            'message' => "Error: No se puede borrar la materia, está asignada a estudiantes." //variable string
+        ];
+    }
+    
     $sql = "DELETE FROM subjects WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id);
